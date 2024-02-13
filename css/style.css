@@ -8,13 +8,9 @@ body{
 h1{
 	text-align: center;
 	color: black;
-	margin-bottom: 0.5rem;
-}
-
-h2{
-	text-align: center;
 	margin-bottom: 2rem;
 }
+
 
 .page-wrapper{
 	display: grid;
@@ -102,7 +98,7 @@ form{
 	align-items: center;
 }
  .delete-button{
-	width: 6rem;
+	width: 4rem;
 	height: 1.5rem;
 	font-weight: bold;
 	cursor: pointer;
