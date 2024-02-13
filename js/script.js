@@ -1,12 +1,12 @@
 // DECLARING AND INITIALIZING THE MEDICINES ARRAY
-let medicines = [];
+const medicines = [];
 
 // SELECTING ELEMENTS
 const medicineForm = document.querySelector('.medicine-form')
 
 const nameInput = document.querySelector(".name");
-const idInput = document.querySelector(".prod-id");
 const manufactInput = document.querySelector(".manufacturer");
+const selectElementInput = document.querySelector(".form");
 const expdateInput = document.querySelector(".expdate");
 const quantityInput = document.querySelector(".quantity");
 const submitButton = document.querySelector(".submit-button");
@@ -19,8 +19,8 @@ medicineForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const name = nameInput.value;
-  const id = idInput.value;
   const manufacturer = manufactInput.value;
+  const selectElement = selectElementInput.value;
   const expdate = expdateInput.value;
   const quantity = quantityInput.value;
 
@@ -31,7 +31,7 @@ medicineForm.addEventListener('submit', (e) => {
     return;
   }
 
-  const newMedicine = new Medicine(name, id, manufacturer, expdate, quantity);
+  const newMedicine = new Medicine(name, manufacturer, selectElement, expdate, quantity);
 
   Medicine.addMedicine(newMedicine);
   console.log(newMedicine);
@@ -56,24 +56,17 @@ if (savedMedicines) {
 
 
 class Medicine {
-	constructor(name, id, manufacturer, expdate, quantity){
+	constructor(name, manufacturer, expdate, quantity){
 		this.name = name;
-		this.id = id;
 		this.manufacturer = manufacturer;
 		this.expdate = expdate;
     this.quantity = quantity;
 	}
-  static addMedicine(medicine) {
-    medicines.push(medicine);
-    displayMedicine(medicine);
-  }
-
-  static deleteMedicine(id) {
-    medicines = medicines.filter(medicine => medicine.id !== id);
-    updateDisplay();
-    
-    // Save updated medicines array to local storage
-    localStorage.setItem('medicines', JSON.stringify(medicines));
+}
+class MedicineForm extends Medicine {
+  constructor(name, manufacturer, selectElement, expdate, quantity){
+    super(name, manufacturer, expdate, quantity)
+    this.selectElement = selectElement
   }
 }
 

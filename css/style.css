@@ -110,3 +110,9 @@ form{
 	border: none;
 	color: darkred;
 }
+
+footer{
+	display: flex;
+	justify-content: center;
+	margin-top: -2rem;
+}

@@ -11,22 +11,24 @@
 	</head>
 	<body>
 		<header>
-			<h1>INTRANET</h1>
 			<h2>Pharmacy inventory management system</h2>
 		</header>
 		
 		<main class="page-wrapper">
 			<form class="medicine-form">
 				<label for="name">Product name:</label>
-				<input type="text" name="name" class="name" required>
-				<label for="prod-id">Product ID:</label>
-				<input type="text" name="prod-id" class="prod-id" required>
+				<input type="text" name="name" class="name">
 				<label for="manufacturer">Manufacturer:</label>
-				<input type="text" name="manufacturer" class="manufacturer" required>
+				<input type="text" name="manufacturer" class="manufacturer">
+				<label for="text">Form:</label>
+				<select name="form" class="form">
+					<option value="tablet">Tablet</option>
+					<option value="suspension">Oral suspension</option>
+				</select>
 				<label for="expdate">Expiration date:</label>
-				<input type="date" name="expdate" class="expdate" required>
+				<input type="date" name="expdate" class="expdate">
 				<label for="quantity">Quantity:</label>
-				<input type="number" name="quantity" class="quantity" required>
+				<input type="number" name="quantity" class="quantity">
 				<button class="submit-button">Add to storage</button>
 			</form>
 			<div class="image-container">
@@ -35,9 +37,10 @@
 			<section class="medicine-list">
 				<div class="display-medicine-container">
 					<header class="display-medicine-header">
+						<span>Product ID</span>
 						<span>Product name</span>
-						<span>ID</span>
 						<span>Manufacturer</span>
+						<span>Form</span>
 						<span>Exp. date</span>
 						<span>Quantity</span>
 						<span></span>
@@ -49,6 +52,8 @@
 			</section>
 		</main>
 		
+		<footer>Pharmacy 2024</footer>
+
 		<script src="/js/script.js"></script>
 	</body>
 </html>
