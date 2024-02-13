@@ -31,7 +31,6 @@ class Medicine {
     const index = medicines.findIndex(medicine => medicine.id === this.id);
     if (index !== -1) {
       medicines.splice(index, 1);
-      console.log(`Medicine with ID ${this.id} has been deleted.`);
     }
   }
 }
@@ -39,7 +38,7 @@ class Medicine {
 // Form validation function
 function validateForm(name, manufacturer, expdate, quantity) {
   if (!name || !manufacturer || !expdate || !quantity) {
-    document.querySelector('.error-message').textContent = "Please fill in all fields";
+    document.querySelector('.error-message').textContent = "Please fill in all fields.";
     return false;
   }
   return true;
@@ -69,7 +68,6 @@ medicineForm.addEventListener('submit', (e) => {
   if (existingMedicine) {
     // If medicine already exists, update the quantity
     existingMedicine.quantity = parseInt(existingMedicine.quantity) + parseInt(quantity);
-    console.log(`Quantity of existing medicine updated: ${existingMedicine.quantity}`);
   } else {
     // If medicine doesn't exist, add a new one
     const id = Date.now();
@@ -91,7 +89,8 @@ medicineForm.addEventListener('submit', (e) => {
 
 // Function to format expiry date
 function formatExpDate(expdate) {
-  return new Date(expdate).toLocaleDateString('en-US');
+  const formattedDate = new Date(expdate).toISOString().split('T')[0];
+  return formattedDate;
 }
 
 // Retrieve medicines array from local storage
@@ -120,7 +119,7 @@ function saveMedicinesToLocalStorage() {
 
 // Function to update the display of medicines
 function updateDisplay() {
-  medicinesUl.innerHTML = ''; // Clear the existing list
+  medicinesUl.textContent = ''; // Clear the existing list
 
   medicines.forEach(medicine => {
     displayMedicine(medicine);
@@ -158,7 +157,6 @@ function displayMedicine(medicine) {
   deleteButtonContainer.append(deleteButton);
 
   deleteButton.addEventListener('click', () => {
-    console.log('Delete button clicked'); // Check if this log is displayed
     const rowID = liRow.dataset.id;
     const medicineToDelete = medicines.find(m => m.id === parseInt(rowID));
     
