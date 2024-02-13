@@ -10,6 +10,7 @@ const expdateInput = document.querySelector(".expdate"); // Expiry date input fi
 const quantityInput = document.querySelector(".quantity"); // Quantity input field
 const submitButton = document.querySelector(".submit-button"); // Submit button
 const medicinesUl = document.querySelector('.display-medicines-list'); // Medicines list
+const medicinesTotal = document.querySelector('.display-medicines-total'); // Medicines totals
 
 // Medicine class
 class Medicine {
@@ -38,7 +39,7 @@ class Medicine {
 // Form validation function
 function validateForm(name, manufacturer, expdate, quantity) {
   if (!name || !manufacturer || !expdate || !quantity) {
-    alert("Please fill in all fields.");
+    document.querySelector('.error-message').textContent = "Please fill in all fields";
     return false;
   }
   return true;
@@ -124,6 +125,7 @@ function updateDisplay() {
   medicines.forEach(medicine => {
     displayMedicine(medicine);
   });
+  medicinesTotal.textContent = `Total products: ${medicines.length}`;
 }
 
 // Function to display a medicine in the list
