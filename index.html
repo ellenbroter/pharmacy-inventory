@@ -20,11 +20,14 @@
 				<input type="text" name="name" class="name">
 				<label for="manufacturer">Manufacturer:</label>
 				<input type="text" name="manufacturer" class="manufacturer">
-				<label for="text">Form:</label>
-				<select name="form" class="form">
-					<option value="tablet">Tablet</option>
-					<option value="suspension">Oral suspension</option>
-				</select>
+				<div>
+					<input type="radio" name="category" value="tablet" class="tablet">
+					<label for="tablet">Tablets</label>	
+				</div>
+				<div>
+					<input type="radio" name="category" value="suspension" class="suspension">
+					<label for="suspension">Oral suspension</label>
+				</div>
 				<label for="expdate">Expiration date:</label>
 				<input type="date" name="expdate" class="expdate">
 				<label for="quantity">Quantity:</label>
@@ -41,7 +44,7 @@
 						<span>ID</span>
 						<span>Product name</span>
 						<span>Manufacturer</span>
-						<span>Form</span>
+						<span>Category</span>
 						<span>Exp. date</span>
 						<span>Quantity</span>
 						<span></span>

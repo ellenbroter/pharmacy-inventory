@@ -2,23 +2,20 @@
 let medicines = [];
 
 // SELECTING ELEMENTS
-const medicineForm = document.querySelector('.medicine-form'); // Form element
-const nameInput = document.querySelector(".name"); // Name input field
-const manufactInput = document.querySelector(".manufacturer"); // Manufacturer input field
-const selectElementInput = document.querySelector(".form"); // Select element input field
-const expdateInput = document.querySelector(".expdate"); // Expiry date input field
-const quantityInput = document.querySelector(".quantity"); // Quantity input field
-const submitButton = document.querySelector(".submit-button"); // Submit button
-const medicinesUl = document.querySelector('.display-medicines-list'); // Medicines list
-const medicinesTotal = document.querySelector('.display-medicines-total'); // Medicines totals
+const medicineForm = document.querySelector('.medicine-form');
+const nameInput = document.querySelector(".name");
+const manufacturerInput = document.querySelector(".manufacturer");
+const expiryDateInput = document.querySelector(".expdate");
+const quantityInput = document.querySelector(".quantity");
+const submitButton = document.querySelector(".submit-button");
+const medicinesUl = document.querySelector('.display-medicines-list');
+const medicinesTotal = document.querySelector('.display-medicines-total');
 
-// Medicine class
 class Medicine {
-  constructor(name, manufacturer, selectElement, expdate, quantity, id) {
+  constructor(name, manufacturer, expiryDate, quantity, id) {
     this.name = name;
     this.manufacturer = manufacturer;
-    this.selectElement = selectElement;
-    this.expdate = expdate;
+    this.expiryDate = expiryDate;
     this.quantity = quantity;
     this.id = id;
   }
@@ -27,18 +24,41 @@ class Medicine {
     console.log(`${medicine.manufacturer} ${medicine.name} has been added to the inventory.`);
   }
 
-  deleteMedicine(medicines) {
-    const index = medicines.findIndex(medicine => medicine.id === this.id);
+  static deleteMedicine(medicines, id) {
+    const index = medicines.findIndex(medicine => medicine.id === id);
     if (index !== -1) {
       medicines.splice(index, 1);
     }
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      manufacturer: this.manufacturer,
+      expiryDate: this.expiryDate,
+      quantity: this.quantity,
+      id: this.id,
+    };
+  }
 }
 
-// Form validation function
-function validateForm(name, manufacturer, expdate, quantity) {
-  if (!name || !manufacturer || !expdate || !quantity) {
-    document.querySelector('.error-message').textContent = "Please fill in all fields.";
+class Tablet extends Medicine {
+  constructor(name, manufacturer, selectElement, expiryDate, quantity, id) {
+    super(name, manufacturer, expiryDate, quantity, id);
+    this.selectElement = selectElement;
+  }
+}
+
+class Suspension extends Medicine {
+  constructor(name, manufacturer, selectElement, expiryDate, quantity, id) {
+    super(name, manufacturer, expiryDate, quantity, id);
+    this.selectElement = selectElement;
+  }
+}
+
+function validateForm(name, manufacturer, expiryDate, quantity) {
+  if (!name || !manufacturer || !expiryDate || !quantity) {
+    displayErrorMessage("Please fill in all fields.");
     return false;
   }
   return true;
@@ -49,31 +69,41 @@ medicineForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const name = nameInput.value;
-  const manufacturer = manufactInput.value;
-  const selectElement = selectElementInput.value;
-  const expdate = expdateInput.value;
+  const manufacturer = manufacturerInput.value;
+  const selectElement = document.querySelector('input[name="category"]:checked') ? document.querySelector('input[name="category"]:checked').value : '';
+  const expiryDate = expiryDateInput.value;
   const quantity = quantityInput.value;
 
-  if (!validateForm(name, manufacturer, expdate, quantity)) {
+  if (!validateForm(name, manufacturer, expiryDate, quantity)) {
     return;
   }
+
 
   const existingMedicine = medicines.find(medicine =>
     medicine.name === name &&
     medicine.manufacturer === manufacturer &&
     medicine.selectElement === selectElement &&
-    medicine.expdate === expdate
+    medicine.expiryDate === expiryDate
   );
 
-  if (existingMedicine) {
-    // If medicine already exists, update the quantity
-    existingMedicine.quantity = parseInt(existingMedicine.quantity) + parseInt(quantity);
-  } else {
-    // If medicine doesn't exist, add a new one
-    const id = Date.now();
-    const newMedicine = new Medicine(name, manufacturer, selectElement, expdate, quantity, id);
-    medicines.push(newMedicine);
-    Medicine.addMedicine(newMedicine);
+  if (selectElement == 'tablet') {
+    if (existingMedicine) {
+      existingMedicine.quantity = parseInt(existingMedicine.quantity) + parseInt(quantity);
+    } else {
+      const id = Date.now();
+      const newMedicine = new Tablet(name, manufacturer, selectElement, expiryDate, quantity, id);
+      medicines.push(newMedicine);
+      Medicine.addMedicine(newMedicine);
+    }
+  } else if (selectElement == 'suspension') {
+    if (existingMedicine) {
+      existingMedicine.quantity = parseInt(existingMedicine.quantity) + parseInt(quantity);
+    } else {
+      const id = Date.now();
+      const newMedicine = new Suspension(name, manufacturer, selectElement, expiryDate, quantity, id);
+      medicines.push(newMedicine);
+      Medicine.addMedicine(newMedicine);
+    }
   }
 
   updateDisplay();
@@ -81,40 +111,62 @@ medicineForm.addEventListener('submit', (e) => {
 
   // Clear the form after successful submission
   nameInput.value = '';
-  manufactInput.value = '';
-  selectElementInput.value = '';
-  expdateInput.value = '';
+  manufacturerInput.value = '';
+  selectElement.value = '';
+  expiryDateInput.value = '';
   quantityInput.value = '';
 });
 
 // Function to format expiry date
-function formatExpDate(expdate) {
-  const formattedDate = new Date(expdate).toISOString().split('T')[0];
-  return formattedDate;
+function formatExpiryDate(expiryDate) {
+  const formattedDate = new Date(expiryDate);
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+  return formattedDate.toLocaleDateString(undefined, options);
 }
 
 // Retrieve medicines array from local storage
-const savedMedicines = JSON.parse(localStorage.getItem('medicines'));
-
-// Check if there are saved medicines
-if (savedMedicines) {
-  // Update the medicines array with the saved data
-  medicines = savedMedicines.map(savedMedicine => new Medicine(
-    savedMedicine.name,
-    savedMedicine.manufacturer,
-    savedMedicine.selectElement,
-    savedMedicine.expdate,
-    savedMedicine.quantity,
-    savedMedicine.id
-  ));
-
-  // Update the display with the saved medicines
-  updateDisplay();
+function getMedicinesFromLocalStorage() {
+  try {
+    const savedMedicines = JSON.parse(localStorage.getItem('medicines')) || [];
+    if (!Array.isArray(savedMedicines)) {
+      throw new Error('Invalid data format in local storage.');
+    }
+    return savedMedicines;
+  } catch (error) {
+    console.error('Error retrieving data from local storage:', error);
+    displayErrorMessage('Error retrieving data. Please refresh the page.');
+    return [];
+  }
 }
 
-// Function to save medicines to local storage
+// Function to save medicines to local storage with enhanced error handling
 function saveMedicinesToLocalStorage() {
-  localStorage.setItem('medicines', JSON.stringify(medicines));
+  try {
+    const stringifiedMedicines = JSON.stringify(medicines.map(medicine => medicine.toJSON()));
+    localStorage.setItem('medicines', stringifiedMedicines);
+
+    // Verify if data was saved successfully
+    const storedMedicines = JSON.parse(localStorage.getItem('medicines'));
+
+    if (!Array.isArray(storedMedicines) || storedMedicines.length !== medicines.length) {
+      throw new Error('Data mismatch or invalid data format in local storage.');
+    }
+
+    console.log('Medicines saved successfully to local storage!');
+  } catch (error) {
+    console.error('Error saving data to local storage:', error);
+    displayErrorMessage('Error saving data. Please try again.');
+  }
+}
+
+// Display error message
+function displayErrorMessage(message) {
+  const errorMessage = document.querySelector('.error-message');
+  errorMessage.textContent = message;
+  // You might want to hide the message after a few seconds or on the next user interaction
+  setTimeout(() => {
+    errorMessage.textContent = '';
+  }, 5000); // 5000 milliseconds (adjust as needed)
 }
 
 // Function to update the display of medicines
@@ -127,14 +179,14 @@ function updateDisplay() {
   medicinesTotal.textContent = `Total products: ${medicines.length}`;
 }
 
-// Function to display a medicine in the list
+// Function to display a medicine
 function displayMedicine(medicine) {
   const liRow = document.createElement('li');
   const renderedId = document.createElement('span');
   const renderedName = document.createElement('span');
   const renderedManufacturer = document.createElement('span');
   const renderedSelectValue = document.createElement('span');
-  const renderedExpdate = document.createElement('span');
+  const renderedExpiryDate = document.createElement('span');
   const renderedQuantity = document.createElement('span');
   const deleteButtonContainer = document.createElement('span');
   const deleteButton = document.createElement('button');
@@ -143,7 +195,7 @@ function displayMedicine(medicine) {
   renderedName.textContent = medicine.name;
   renderedManufacturer.textContent = medicine.manufacturer;
   renderedSelectValue.textContent = medicine.selectElement;
-  renderedExpdate.textContent = formatExpDate(medicine.expdate);
+  renderedExpiryDate.textContent = formatExpiryDate(medicine.expiryDate); // Format the expiry date
   renderedQuantity.textContent = medicine.quantity;
   deleteButton.textContent = 'Delete';
 
@@ -153,17 +205,37 @@ function displayMedicine(medicine) {
   liRow.dataset.id = medicine.id;
 
   medicinesUl.append(liRow);
-  liRow.append(renderedId, renderedName, renderedManufacturer, renderedSelectValue, renderedExpdate, renderedQuantity, deleteButtonContainer);
+  liRow.append(renderedId, renderedName, renderedManufacturer, renderedSelectValue, renderedExpiryDate, renderedQuantity, deleteButtonContainer);
   deleteButtonContainer.append(deleteButton);
+}
 
-  deleteButton.addEventListener('click', () => {
+// Event delegation for delete button click
+medicinesUl.addEventListener('click', (e) => {
+  if (e.target.classList.contains('delete-button')) {
+    const liRow = e.target.closest('.medicines-row');
     const rowID = liRow.dataset.id;
     const medicineToDelete = medicines.find(m => m.id === parseInt(rowID));
-    
+
     if (medicineToDelete) {
-      medicineToDelete.deleteMedicine(medicines);
+      Medicine.deleteMedicine(medicines, medicineToDelete.id);
       updateDisplay();
       saveMedicinesToLocalStorage();
     }
-  });
-}
+  }
+});
+
+// Check if there are saved medicines
+const savedMedicines = getMedicinesFromLocalStorage();
+
+// Update the medicines array with the saved data
+medicines = savedMedicines.map(savedMedicine => new Medicine(
+  savedMedicine.name,
+  savedMedicine.manufacturer,
+  savedMedicine.selectElement,
+  savedMedicine.expiryDate,
+  savedMedicine.quantity,
+  savedMedicine.id
+));
+
+// Update the display with the saved medicines
+updateDisplay();
