@@ -64,7 +64,7 @@ function validateForm(name, manufacturer, expiryDate, quantity) {
   return true;
 }
 
-// Form submission event listener
+// FORM SUBMISSION EVENT LISTENER
 medicineForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -109,7 +109,7 @@ medicineForm.addEventListener('submit', (e) => {
   updateDisplay();
   saveMedicinesToLocalStorage();
 
-  // Clear the form after successful submission
+  // CLEAR THE FORM AFTER SUCCESSFUL SUBMISSION
   nameInput.value = '';
   manufacturerInput.value = '';
   selectElement.value = '';
@@ -117,14 +117,14 @@ medicineForm.addEventListener('submit', (e) => {
   quantityInput.value = '';
 });
 
-// Function to format expiry date
+// FUNCTION TO FORMAT EXPIRY DATE
 function formatExpiryDate(expiryDate) {
   const formattedDate = new Date(expiryDate);
   const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
   return formattedDate.toLocaleDateString(undefined, options);
 }
 
-// Retrieve medicines array from local storage
+// RETRIEVE MEDICINES ARRAY FROM LOCAL STORAGE
 function getMedicinesFromLocalStorage() {
   try {
     const savedMedicines = JSON.parse(localStorage.getItem('medicines')) || [];
@@ -139,13 +139,13 @@ function getMedicinesFromLocalStorage() {
   }
 }
 
-// Function to save medicines to local storage with enhanced error handling
+// SAVE MEDICINES TO LOCAL STORAGE
 function saveMedicinesToLocalStorage() {
   try {
     const stringifiedMedicines = JSON.stringify(medicines.map(medicine => medicine.toJSON()));
     localStorage.setItem('medicines', stringifiedMedicines);
 
-    // Verify if data was saved successfully
+    // HANDELING ERRORS
     const storedMedicines = JSON.parse(localStorage.getItem('medicines'));
 
     if (!Array.isArray(storedMedicines) || storedMedicines.length !== medicines.length) {
@@ -159,7 +159,7 @@ function saveMedicinesToLocalStorage() {
   }
 }
 
-// Display error message
+// DISPLAY ERROR MESSAGE
 function displayErrorMessage(message) {
   const errorMessage = document.querySelector('.error-message');
   errorMessage.textContent = message;
@@ -169,9 +169,9 @@ function displayErrorMessage(message) {
   }, 5000); // 5000 milliseconds (adjust as needed)
 }
 
-// Function to update the display of medicines
+// UPDATE DISPLAY OF MEDICINES
 function updateDisplay() {
-  medicinesUl.textContent = ''; // Clear the existing list
+  medicinesUl.textContent = ''; 
 
   medicines.forEach(medicine => {
     displayMedicine(medicine);
@@ -195,7 +195,7 @@ function displayMedicine(medicine) {
   renderedName.textContent = medicine.name;
   renderedManufacturer.textContent = medicine.manufacturer;
   renderedSelectValue.textContent = medicine.selectElement;
-  renderedExpiryDate.textContent = formatExpiryDate(medicine.expiryDate); // Format the expiry date
+  renderedExpiryDate.textContent = formatExpiryDate(medicine.expiryDate);
   renderedQuantity.textContent = medicine.quantity;
   deleteButton.textContent = 'Delete';
 
@@ -209,7 +209,7 @@ function displayMedicine(medicine) {
   deleteButtonContainer.append(deleteButton);
 }
 
-// Event delegation for delete button click
+// EVENT DELEGATION FOR DELETE BUTTON CLICK
 medicinesUl.addEventListener('click', (e) => {
   if (e.target.classList.contains('delete-button')) {
     const liRow = e.target.closest('.medicines-row');
@@ -224,10 +224,10 @@ medicinesUl.addEventListener('click', (e) => {
   }
 });
 
-// Check if there are saved medicines
+// CHECK IF THERE ARE SAVED MEDICINES
 const savedMedicines = getMedicinesFromLocalStorage();
 
-// Update the medicines array with the saved data
+// UPDATE THE MEDICINES ARRAY WITH THE SAVED DATA
 medicines = savedMedicines.map(savedMedicine => new Medicine(
   savedMedicine.name,
   savedMedicine.manufacturer,
@@ -237,5 +237,5 @@ medicines = savedMedicines.map(savedMedicine => new Medicine(
   savedMedicine.id
 ));
 
-// Update the display with the saved medicines
+// UPDATE THE DISPLAY WITH THE SAVED MEDICINES
 updateDisplay();
